@@ -1,13 +1,48 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import firebaseApp from './config/fbConfig'
+import firebase from 'firebase/compat/app'
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createStore, applyMiddleware, compose } from 'redux'
+import rootReducer from './store/reducers/rootReducer';
+import {Provider} from 'react-redux'
+import thunk from 'redux-thunk'
+// import { reduxFirestore, getFirestore } from '@firebase/firestore';
+import { reduxFirestore, createFirestoreInstance, getFirestore } from 'redux-firestore';
+import { ReactReduxFirebaseProvider, getFirebase } from 'react-redux-firebase';
+
+
+//thunk pauses the action creator, fetches or updates date before sending to the reducer
+const store = createStore(rootReducer,
+  compose(
+    applyMiddleware(thunk.withExtraArgument({getFirebase,getFirestore})),
+    reduxFirestore(firebaseApp)
+    ) 
+  )
+
+  // const createStoreWithFirebase = compose(
+  //   reduxFirestore(firebase, firebaseApp), // firebase instance as first argument, rfConfig as optional second
+  // )(createStore);
+
+  // const store = createStoreWithFirebase(rootReducer, {});
+
+  const rrfProps = {
+    firebase: firebaseApp,
+       config: {},
+       dispatch: store.dispatch,
+       createFirestoreInstance // <- needed if using firestore
+     }
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Provider store={store}>
+    <React.StrictMode>
+    <ReactReduxFirebaseProvider {...rrfProps}>
+      <App />
+    </ReactReduxFirebaseProvider>
+    </React.StrictMode>
+  </Provider>,
   document.getElementById('root')
 );
 
