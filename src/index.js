@@ -11,16 +11,19 @@ import {Provider} from 'react-redux'
 import thunk from 'redux-thunk'
 // import { reduxFirestore, getFirestore } from '@firebase/firestore';
 import { reduxFirestore, createFirestoreInstance, getFirestore } from 'redux-firestore';
-import { ReactReduxFirebaseProvider, getFirebase } from 'react-redux-firebase';
+import { ReactReduxFirebaseProvider, reactReduxFirebase, getFirebase } from 'react-redux-firebase';
 
 
 //thunk pauses the action creator, fetches or updates date before sending to the reducer
 const store = createStore(rootReducer,
   compose(
     applyMiddleware(thunk.withExtraArgument({getFirebase,getFirestore})),
-    reduxFirestore(firebaseApp)
+    reduxFirestore(firebaseApp),
+    // reactReduxFirebase(firebaseApp, { attachAuthIsReady: true })
     ) 
   )
+
+  
 
   // const createStoreWithFirebase = compose(
   //   reduxFirestore(firebase, firebaseApp), // firebase instance as first argument, rfConfig as optional second
@@ -34,6 +37,10 @@ const store = createStore(rootReducer,
        dispatch: store.dispatch,
        createFirestoreInstance // <- needed if using firestore
      }
+
+// store.firebaseAuthIsReady.then(() => {
+
+// })
 
 ReactDOM.render(
   <Provider store={store}>
