@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 import { createProject } from '../../store/actions/projectActions'
+
 
 class CreateProject extends Component {
     state = {
@@ -19,6 +21,8 @@ class CreateProject extends Component {
         this.props.createProject(this.state)
     }
     render() {
+        const {auth} = this.props
+        if(!auth.uid) return <Redirect to='/signin' />
         return (
             <div className="container">
                 <form className="white" onSubmit={this.handleSubmit}>
@@ -40,6 +44,12 @@ class CreateProject extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        auth: state.firebase.auth
+    }
+}
+
 // const mapDispatchToProps = (dispatch) => {
 //     return {
 //         createProject: (project) => dispatch(createProject(project))
@@ -47,4 +57,4 @@ class CreateProject extends Component {
 // }
 
 // you map state to props before dispatch but in the absece of state, use null
-export default connect(null,{createProject})(CreateProject)
+export default connect(mapStateToProps,{createProject})(CreateProject)
